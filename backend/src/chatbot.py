@@ -19,7 +19,7 @@ Settings.llm = Groq(model="llama3-8b-8192", api_key=config("GROQ_API_KEY"))    #
 
 Settings.embed_model = AzureOpenAIEmbedding(
     model="text-embedding-ada-002",
-    deployment_name="my-custom-embedding",
+    deployment_name="my-custom-embedding",             #Lấy tên của embedding model gán vào biến deployment_name
     api_key=config("AZURE_OPENAI_API_KEY"),            #Lấy azure openai api key gán vào biến api_key
     azure_endpoint=config("AZURE_OPENAI_ENDPOINT"),    #lấy azure openao endpoint gán vào biến azure_endpoint
     api_version="2024-05-01-preview",
