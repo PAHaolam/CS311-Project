@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+llama-index
+llama-index-llms-groq
+llama-index-embeddings-azure-openai
+python-decouple

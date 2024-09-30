@@ -1,0 +1,8 @@
+# Bỏ qua file môi trường trong backend
+.env
+
+# Python specific ignores (backend)
+__pycache__/
+*.py[cod]
+
+stole_rag/
