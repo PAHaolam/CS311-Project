@@ -7,7 +7,7 @@ pip install -r requirements.txt
 
 ## Run backend
 ```
-uvicorn main:app --reload
+uvicorn src.main:app --reload
 ```
 
 ## Run frontend
