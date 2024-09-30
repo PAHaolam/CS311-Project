@@ -1,1 +1,16 @@
-"# CS311-Project" 
+Mở 2 terminal ở frontend và backend
+
+## Setup backend
+```
+pip install -r requirements.txt
+```
+
+## Run backend
+```
+uvicorn main:app --reload
+```
+
+## Run frontend
+```
+npm start
+```
