@@ -14,14 +14,14 @@ logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 
 # Set up the Groq class with the required model and API key
-Settings.llm = Groq(model="llama3-8b-8192", api_key=config("GROQ_API_KEY"))
+Settings.llm = Groq(model="llama3-8b-8192", api_key=config("GROQ_API_KEY"))    #Lấy groq api key gán vào biến api_key
 
 
 Settings.embed_model = AzureOpenAIEmbedding(
     model="text-embedding-ada-002",
     deployment_name="my-custom-embedding",
-    api_key=config("AZURE_OPENAI_API_KEY"),
-    azure_endpoint=config("AZURE_OPENAI_ENDPOINT"),
+    api_key=config("AZURE_OPENAI_API_KEY"),            #Lấy azure openai api key gán vào biến api_key
+    azure_endpoint=config("AZURE_OPENAI_ENDPOINT"),    #lấy azure openao endpoint gán vào biến azure_endpoint
     api_version="2024-05-01-preview",
 )
 
