@@ -14,8 +14,10 @@ logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 
 # Set up the Groq class with the required model and API key
-Settings.llm = Groq(model="llama3-8b-8192", api_key=config("GROQ_API_KEY"))    #Lấy groq api key gán vào biến api_key
+Settings.llm = Groq(model="llama3-8b-8192", api_key=config("GROQ_API_KEY"), system_prompt="List some information")    #Lấy groq api key gán vào biến api_key
 
+# response = Settings.llm.complete("Messi")
+# print(type(response.text))
 
 Settings.embed_model = AzureOpenAIEmbedding(
     model="text-embedding-ada-002",
