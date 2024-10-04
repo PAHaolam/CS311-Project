@@ -30,3 +30,21 @@ History:
 Question: Giá bao nhiêu?
 After refining: Truyện Naruto bên shop giá bao nhiêu?
 """
+
+RESTRICT_PROMPT = '''\
+If you have retrieved any record of the book relevant to the information, you must return your reponse in the following format:
+{"Book_1": "id of book 1", "Book_2": "id of book 2", ..., "Book_n": "id of book n"}
+if you do not retrieve any record of the book relevant to the information, you must return your response an empty dict
+{}
+Other than returning the response in the format I provided, you should return absolutely nothing such as note or explanation for your response
+
+
+for example:
+if user look for Naruto book and you retrieve in database 3 record including\
+"Naruto - Tập 1" with id is "0412a256aabe4d269546ce3b99c983dc" and "Naruto - Tập 2" with id is "0aefcd0a0f8e4473b13c536dd8fe240b",\
+you must return your response is
+{"Book_1": "0412a256aabe4d269546ce3b99c983dc", "Book_2": "0aefcd0a0f8e4473b13c536dd8fe240b"}
+
+if user look for Doraemon book and you do not retrive in database any book relevant to Doraemon,\
+you must return your response is {}
+'''

@@ -13,7 +13,7 @@ from llama_index.core.llms.function_calling import FunctionCallingLLM
 from llama_index.core.indices.struct_store.sql_query import SQLTableRetrieverQueryEngine
 from decouple import config
 from Chatbot.database.run import get_db_context, engine
-from Chatbot.prompt import REFINE_PROMPT
+from Chatbot.prompt import REFINE_PROMPT, RESTRICT_PROMPT
 from Chatbot.settings import MessageRole, Settings
 
 
@@ -70,7 +70,7 @@ class SQLAgent:
 
         self.query_engine = SQLTableRetrieverQueryEngine(
             self.sql_database,
-            self.obj_index.as_retriever(similarity_top_k=1),
+            self.obj_index.as_retriever(similarity_top_k=3),
             llm=llm,
             streaming=True,
         )
@@ -95,7 +95,7 @@ class SQLAgent:
     def refine_question(self, question: str):
         prompt = f"History: {self.get_history(self.setting.number_of_msgs)}\nQuestion: {question}\nYour refined question: "
         response = self.refine_llm.complete(prompt)
-        return response.text
+        return response.text# + RESTRICT_PROMPT
 
     def query(self, question: str) -> str:
         prompt = self.refine_question(question)

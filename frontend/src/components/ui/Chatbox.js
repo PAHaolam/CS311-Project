@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-const Chatbox = ({ show, closeChatbox, content, inputValue, handleInputChange, handleSendMessage }) => {
+const Chatbox = ({ show, closeChatbox, content, inputValue, handleInputChange, handleSendMessage, responseWaiting }) => {
   // Tạo ref để tham chiếu đến div chatbox-messages
   const messagesEndRef = useRef(null);
 
@@ -10,7 +10,7 @@ const Chatbox = ({ show, closeChatbox, content, inputValue, handleInputChange, h
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [content]); // Mỗi khi content thay đổi, useEffect sẽ được kích hoạt
+  }, [content, responseWaiting]); // Mỗi khi content thay đổi, useEffect sẽ được kích hoạt
 
   return (
     <>
@@ -43,6 +43,20 @@ const Chatbox = ({ show, closeChatbox, content, inputValue, handleInputChange, h
                       </div>
                     );
                   })
+                }
+                {
+                  responseWaiting && (
+                    <div className={'message received'}>
+                      <div className="content">
+                        {/* {message.contentChat} */}
+                        <div class="bouncing-dots">
+                          <div class="dot"></div>
+                          <div class="dot"></div>
+                          <div class="dot"></div>
+                        </div>
+                      </div>
+                    </div>
+                  )
                 }
                 <div ref={messagesEndRef} />
             </div>
