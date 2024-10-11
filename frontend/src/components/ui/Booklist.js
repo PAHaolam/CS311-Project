@@ -9,34 +9,34 @@ const Booklist = ({ selectedBooks }) => {
                     return (
                         <div key={index} className="col mb-5">
                             <div className="card h-100">
-                            <div className="image-container">
-                                <img
-                                src="https://dummyimage.com/960x1280"
-                                alt="..."
-                                />
-                            </div>
-                            <div
-                                className="badge bg-dark text-white position-absolute"
-                                style={{ top: "0.5rem", right: "0.5rem" }}
-                            >
-                                Kết quả
-                            </div>
-                            <div className="card-body p-4">
-                                <div className="text-center">
-                                <h5 className="fw-bolder">{book}</h5>
-                                <span className="text-muted text-decoration-line-through">
-                                    40,000₫
-                                </span>
-                                36,000₫
-                                </div>
-                            </div>
-                            <div className="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div className="text-center">
-                                <a className="btn btn-outline-dark mt-auto" href="/">
-                                    Thêm vào giỏ hàng
+                                <a href={book.url} className="image-container" style={{ textDecoration: 'none' }}>
+                                    <img
+                                    src="https://dummyimage.com/960x1280"
+                                    alt="..."
+                                    />
                                 </a>
+                                <div
+                                    className="badge bg-dark text-white position-absolute"
+                                    style={{ top: "0.5rem", right: "0.5rem" }}
+                                >
+                                    Kết quả
                                 </div>
-                            </div>
+                                <div className="card-body p-4">
+                                    <div className="text-center">
+                                    <h5 className="fw-bolder">{book.title}</h5>
+                                    <span className="text-muted text-decoration-line-through">
+                                        {new Intl.NumberFormat('vi-VN').format(book.original_price)}₫
+                                    </span>
+                                    {new Intl.NumberFormat('vi-VN').format(book.current_price)}₫
+                                    </div>
+                                </div>
+                                <div className="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                    <div className="text-center">
+                                    <a className="btn btn-outline-dark mt-auto" href="/">
+                                        Thêm vào giỏ hàng
+                                    </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     );

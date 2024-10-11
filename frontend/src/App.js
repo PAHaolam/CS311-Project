@@ -23,21 +23,11 @@ const api = axios.create({
   baseURL: 'http://localhost:8000'
 })
 
-function generateRandomString(length) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
-
 function App() {
   const [showChatbox, setShowChatbox] = useState(false);
   const [contentChatbox, setContentChatbox] = useState([{"typeChat": "received", "contentChat": "Xin chào! tôi là trợ lý bán sách, hãy nhập thông tin về sách bạn mong muốn, tôi sẽ giúp giúp bạn tìm kiếm hoặc đưa ra gợi ý cho bạn"}])
   const [inputValue, setInputValue] = useState('');  // State để lưu trữ giá trị của input
-  const [selectedBooks, setSelectedBooks] = useState([generateRandomString(10), generateRandomString(10), generateRandomString(10), generateRandomString(10), generateRandomString(10), generateRandomString(10), generateRandomString(10), generateRandomString(10)])
+  const [selectedBooks, setSelectedBooks] = useState([])
   const [responseWaiting, setResponseWaiting] = useState(false)
 
   const openChatbox = (event) => {
@@ -62,13 +52,14 @@ function App() {
     setTimeout(async () => {
       setResponseWaiting(true)
       try{
-        const response = await api.post('/chat', { message: inputValue });
+        const response = await api.post('/v1/complete', { message: inputValue });
+        console.log(response.data.sql_query)
         //console.log(response.data.answer)
         setResponseWaiting(false)
-        setContentChatbox(prevContent => prevContent.concat({ "typeChat": "received", "contentChat": response.data.answer }));
-        if(response.data.title_books.length>0){
-          setSelectedBooks(response.data.title_books)
-        }
+        setContentChatbox(prevContent => prevContent.concat({ "typeChat": "received", "contentChat": response.data }));
+        // if(response.data.books.length>0){
+        //   setSelectedBooks(response.data.books)
+        // }
       } catch (error) {
         console.error("Error fetching API response:", error);
         setResponseWaiting(false)

@@ -5,6 +5,12 @@
 __pycache__/
 *.py[cod]
 
-stole_rag/
+RAG_tool/
 
-nothing.py
+tester/
+
+venv/
+
+sample_data/
+
+SQLAgent/
