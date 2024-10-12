@@ -52,14 +52,14 @@ function App() {
     setTimeout(async () => {
       setResponseWaiting(true)
       try{
-        const response = await api.post('/v1/complete', { message: inputValue });
-        console.log(response.data.sql_query)
-        //console.log(response.data.answer)
+        let response = await api.post('/v1/complete', { message: inputValue });
+      
         setResponseWaiting(false)
-        setContentChatbox(prevContent => prevContent.concat({ "typeChat": "received", "contentChat": response.data }));
-        // if(response.data.books.length>0){
-        //   setSelectedBooks(response.data.books)
-        // }
+        setContentChatbox(prevContent => prevContent.concat({ "typeChat": "received", "contentChat": response.data.response }));
+        if(response.data.books.length>0){
+          setSelectedBooks(response.data.books)
+        }
+        // console.log(response.data.books)
       } catch (error) {
         console.error("Error fetching API response:", error);
         setResponseWaiting(false)

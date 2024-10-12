@@ -129,7 +129,8 @@ class ChatbotAssistant:
         Returns:
             str: The response.
         """
-        return self.query_engine.chat(query)
+        # self.query_engine.reset()
+        return self.query_engine.chat(query).response
 
     def predict(self, prompt):
         """

@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from api.controller import router
+from QdrantElasticAgent.api.controller import router
 
 
 app = FastAPI()

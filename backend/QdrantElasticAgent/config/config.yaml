@@ -24,7 +24,7 @@ CONTEXTUAL_RAG:
     SEMANTIC_WEIGHT: 0.8
     BM25_WEIGHT: 0.2
 
-    TOP_N: 3
+    TOP_N: 10
 
 AGENT:
-    TYPE: "openai" # [openai, react]
+    TYPE: "react" # [openai, react]

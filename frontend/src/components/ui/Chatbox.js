@@ -61,7 +61,17 @@ const Chatbox = ({ show, closeChatbox, content, inputValue, handleInputChange, h
                 <div ref={messagesEndRef} />
             </div>
             <div className="chatbox-input">
-                <input type="text" placeholder="Bạn muốn tìm gì ?" value={inputValue} onChange={handleInputChange}/>
+                <input 
+                  type="text" 
+                  placeholder="Bạn muốn tìm gì ?" 
+                  value={inputValue} 
+                  onChange={handleInputChange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        handleSendMessage(); // Gọi hàm khi nhấn Enter
+                    }
+                }}
+                />
                 <button onClick={handleSendMessage}>📨</button>
             </div>
         </div>

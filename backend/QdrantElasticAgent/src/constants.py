@@ -1,7 +1,7 @@
 from config.config import get_config
 
-cfg = get_config("config/config.yaml")
-cfg.merge_from_file("config/postgres.yaml")
+cfg = get_config("QdrantElasticAgent/config/config.yaml")
+cfg.merge_from_file("QdrantElasticAgent/config/postgres.yaml")
 
 
 STREAM = cfg.MODEL.STREAM
@@ -25,6 +25,14 @@ QA_PROMPT = (
     "{context_str}"
     "\n---------------------\n"
     "Given this information, please answer the question: {query_str}\n"
+    "If this information is about ISBN (e.g: 067176537X, 3404921038, ...) or title of a book or list of books, you will define whether if users are finding some specific books or users dont find the specific books and want to be suggested some books\n"
+    "1. if users are finding some specific books, your response should be:\n"
+    "'Vâng, chúng tôi có cuốn sách ... (Name of books that user expect), bạn có thể tham khảo qua!' or 'Đây là danh sách sách các sách liên quan đến ... (Name of books that user expect), mời bạn tham khảo' if given information includes the books\n"
+    "'Xin lỗi, hiện tại bên chúng tôi đang không có sách mà bạn đang cần, bạn có thể thử tìm sách khác hoặc chúng tôi có thể đề xuất cho bạn một số sách' if given information not includes the books\n"
+    "2. if users dont find the specific books and want to be suggested some books, your response should be:\n"
+    "'Đây là một số sách tôi có thể đề xuất cho bạn'\n"
+    "please return your response exactly in the format:\n"
+    "{{'response': <your response>, 'book_list': <list of ISBN of books in given information>\}} notice that if there is no book in given information, please return the empty list\n"
 )
 
 # Contextual RAG
