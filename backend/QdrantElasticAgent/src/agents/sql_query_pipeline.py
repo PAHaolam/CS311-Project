@@ -25,7 +25,7 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from src.agents.DBschema import Book3
+from src.schemas import Book3
 
 class SQLQueryPipeline:
     def __init__(self):

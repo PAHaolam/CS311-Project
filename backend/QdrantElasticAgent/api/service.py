@@ -13,8 +13,9 @@ from llama_index.core.agent import AgentRunner
 from llama_index.agent.openai import OpenAIAgent
 from llama_index.core.tools import FunctionTool
 from starlette.responses import StreamingResponse, Response
-from src.tools.contextual_rag_tool import load_contextual_rag_tool
-from src.tools.sql_tool import load_sql_tool
+# from src.tools.contextual_rag_tool import load_contextual_rag_tool
+# from src.tools.sql_tool import load_sql_tool
+from src.tools.elastic_search_tool import load_elastic_search_tool
 from src.constants import SERVICE, TEMPERATURE, MODEL_ID, STREAM, AGENT_TYPE
 
 load_dotenv(override=True)
@@ -34,8 +35,9 @@ class ChatbotAssistant:
         """
         # contextual_rag_tool = load_contextual_rag_tool()
         # return [contextual_rag_tool]
-        sql_tool = load_sql_tool()
-        return [sql_tool]
+        # sql_tool = load_sql_tool()
+        elastic_search_tool = load_elastic_search_tool()
+        return [elastic_search_tool]
 
     def add_tools(self, tools: FunctionTool | list[FunctionTool]) -> None:
         """

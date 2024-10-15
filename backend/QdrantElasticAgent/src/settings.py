@@ -10,7 +10,8 @@ from src.constants import (
     CONTEXTUAL_SERVICE,
     NUM_CHUNKS_TO_RECALL,
     CONTEXTUAL_CHUNK_SIZE,
-    ELASTIC_SEARCH_INDEX_NAME,
+    DOC_ELASTIC_SEARCH_INDEX_NAME,
+    BOOK_ELASTIC_SEARCH_INDEX_NAME,
     ORIGINAL_RAG_COLLECTION_NAME,
     CONTEXTUAL_RAG_COLLECTION_NAME,
 )
@@ -56,8 +57,11 @@ class Settings(BaseModel):
     elastic_search_url: str = Field(
         description="The Elastic URL", default=ELASTIC_SEARCH_URL
     )
-    elastic_search_index_name: str = Field(
-        description="The Elastic index name", default=ELASTIC_SEARCH_INDEX_NAME
+    doc_elastic_search_index_name: str = Field(
+        description="The doc Elastic index name", default=DOC_ELASTIC_SEARCH_INDEX_NAME
+    )
+    book_elastic_search_index_name: str = Field(
+        description="The book Elastic index name", default=BOOK_ELASTIC_SEARCH_INDEX_NAME
     )
     num_chunks_to_recall: int = Field(
         description="The number of chunks to recall", default=NUM_CHUNKS_TO_RECALL

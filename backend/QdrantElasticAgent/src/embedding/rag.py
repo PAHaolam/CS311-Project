@@ -34,7 +34,7 @@ from llama_index.core import (
 from src.constants import CONTEXTUAL_PROMPT, QA_PROMPT
 from src.schemas import RAGType, DocumentMetadata
 from src.readers.file_reader import parse_multiple_files
-from src.embedding.elastic_search import ElasticSearch
+from src.embedding.doc_elastic_search import ElasticSearch
 from src.settings import Settings as ConfigSettings, setting as config_setting
 
 
@@ -81,7 +81,7 @@ class RAG:
         )
 
         self.es = ElasticSearch(
-            url=setting.elastic_search_url, index_name=setting.elastic_search_index_name
+            url=setting.elastic_search_url, index_name=setting.doc_elastic_search_index_name
         )
 
         self.qdrant_client = QdrantClient(

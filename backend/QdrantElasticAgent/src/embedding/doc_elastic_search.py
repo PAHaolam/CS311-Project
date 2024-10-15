@@ -3,7 +3,7 @@ from elasticsearch.helpers import bulk
 from elasticsearch import Elasticsearch
 from llama_index.core.bridge.pydantic import Field
 
-from src.schemas import DocumentMetadata, ElasticSearchResponse
+from src.schemas import DocumentMetadata, DocElasticSearchResponse
 
 
 class ElasticSearch:
@@ -79,7 +79,7 @@ class ElasticSearch:
 
         return success
 
-    def search(self, query: str, k: int = 20) -> list[ElasticSearchResponse]:
+    def search(self, query: str, k: int = 20) -> list[DocElasticSearchResponse]:
         """
         Search the documents relevant to the query.
 
@@ -107,7 +107,7 @@ class ElasticSearch:
         response = self.es_client.search(index=self.index_name, body=search_body)
 
         return [
-            ElasticSearchResponse(
+            DocElasticSearchResponse(
                 doc_id=hit["_source"]["doc_id"],
                 content=hit["_source"]["content"],
                 contextualized_content=hit["_source"]["contextualized_content"],

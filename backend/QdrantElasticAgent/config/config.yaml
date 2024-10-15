@@ -17,7 +17,8 @@ CONTEXTUAL_RAG:
     QDRANT_URL: "http://localhost:6333"
 
     ELASTIC_SEARCH_URL: "http://localhost:9200"
-    ELASTIC_SEARCH_INDEX_NAME: "contextual_rag"
+    DOC_ELASTIC_SEARCH_INDEX_NAME: "contextual_rag"
+    BOOK_ELASTIC_SEARCH_INDEX_NAME: "book_rag"
 
     NUM_CHUNKS_TO_RECALL: 150
 
