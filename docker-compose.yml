@@ -1,36 +1,20 @@
 services:
-  backend:
-    build:
-      context: ./backend
-    container_name: backend
-    env_file:
-      - ./backend/.env  # Gọi file .env để load biến môi trường
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
+    qdrant:
+        image: qdrant/qdrant:latest
+        restart: always
+        ports:
+            - "6333:6333"
+            - "6334:6334"
 
-  frontend:
-    build:
-      context: ./frontend
-    container_name: frontend
-    ports:
-      - "3000:3000"
-    stdin_open: true
-    tty: true
-
-  db:
-    image: mysql:8
-    container_name: db
-    environment:
-      MYSQL_ROOT_PASSWORD: dmH16042004  # Mật khẩu cho root user
-      MYSQL_DATABASE: sql_store       # Tên database mà bạn muốn tạo
-      MYSQL_USER: root                # Tên user
-      MYSQL_PASSWORD: dmH16042004         # Mật khẩu cho user
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql  # Lưu trữ dữ liệu MySQL
-
-volumes:
-  db_data:
+    elasticsearch:
+        image: elasticsearch:8.8.0
+        container_name: shc_elasticsearch
+        restart: always
+        environment:
+            - discovery.type=single-node
+            - xpack.security.enabled=false
+            - logger.level=error
+            - ES_JAVA_OPTS=-Xms512m -Xmx512m
+        ports:
+            - "9200:9200"
+            - "9300:9300"

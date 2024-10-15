@@ -1,4 +1,6 @@
 sqlmodel
+PyMySQL
+python-decouple
 python-dotenv
 llama-index
 llama-index-llms-groq==0.1.3

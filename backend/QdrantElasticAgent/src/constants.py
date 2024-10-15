@@ -35,6 +35,20 @@ QA_PROMPT = (
     "{{'response': <your response>, 'book_list': <list of ISBN of books in given information>\}} notice that if there is no book in given information, please return the empty list\n"
 )
 
+FORMATTING_PROMPT = '''
+We have provided the message below.
+---------------------
+{response}
+---------------------
+If this message includes ISBN of a book or list of books, you will separate ISBNs and the main content of given message into two parts.
+Then you will return your response exactly in the format:
+{{'response': <the main content of given message>, 'book_list': <list of ISBNs in given message>\}} notice that if there is no book in given information, please return the empty list
+
+Example:
+Message: Dưới đây là một số sách mà tôi có thể đề xuất cho bạn:\n\n1. 067176537X\n2. 3404921038\n3. 0375759778\n4. 0425163091\n5. 3442353866\n6. 3442410665\n7. 3442446937\n8. 0375406328\n9. 0446310786\n10. 0449005615\n\nNếu bạn cần thông tin chi tiết hơn về bất kỳ cuốn sách nào, hãy cho tôi biết!
+Your response: {{'response': 'Đây là một số sách mà tôi có thể đề xuất cho bạn, nếu bạn cần thông tin chi tiết hơn về bất kỳ cuốn sách nào, hãy cho tôi biết!', 'book_list': ['067176537X', '3404921038', '0375759778', '0425163091', '3442353866', '3442410665', '3442446937', '0375406328', '0446310786', '0449005615']}}
+'''
+
 # Contextual RAG
 CONTEXTUAL_CHUNK_SIZE = cfg.CONTEXTUAL_RAG.CHUNK_SIZE
 CONTEXTUAL_SERVICE = cfg.CONTEXTUAL_RAG.SERVICE

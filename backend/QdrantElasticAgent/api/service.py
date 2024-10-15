@@ -14,6 +14,7 @@ from llama_index.agent.openai import OpenAIAgent
 from llama_index.core.tools import FunctionTool
 from starlette.responses import StreamingResponse, Response
 from src.tools.contextual_rag_tool import load_contextual_rag_tool
+from src.tools.sql_tool import load_sql_tool
 from src.constants import SERVICE, TEMPERATURE, MODEL_ID, STREAM, AGENT_TYPE
 
 load_dotenv(override=True)
@@ -31,8 +32,10 @@ class ChatbotAssistant:
         """
         Load default RAG tool.
         """
-        contextual_rag_tool = load_contextual_rag_tool()
-        return [contextual_rag_tool]
+        # contextual_rag_tool = load_contextual_rag_tool()
+        # return [contextual_rag_tool]
+        sql_tool = load_sql_tool()
+        return [sql_tool]
 
     def add_tools(self, tools: FunctionTool | list[FunctionTool]) -> None:
         """
@@ -130,7 +133,8 @@ class ChatbotAssistant:
             str: The response.
         """
         # self.query_engine.reset()
-        return self.query_engine.chat(query).response
+        response = self.query_engine.chat(query).response
+        return response
 
     def predict(self, prompt):
         """
