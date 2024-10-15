@@ -15,6 +15,9 @@ from llama_index.llms.openai import OpenAI
 from typing import List
 from decouple import config
 from sqlmodel import create_engine, Session, select
+import sqlparse
+from sqlparse.sql import IdentifierList, Identifier
+from sqlparse.tokens import Keyword, DML
 
 import itertools
 import json
@@ -76,11 +79,22 @@ class SQLQueryPipeline:
             "retrieved rows: {context_str}\n"
             "You will define whether if users are finding some specific books or users dont find the specific books and want to be suggested some books\n"
             "1. if users are finding some specific books and given retrieved rows includes the books, your response should be:\n"
-            "Vâng, chúng tôi có cuốn sách ... (Name of books that user expect), bạn có thể tham khảo qua! or Đây là danh sách sách các sách liên quan đến ... (Name of books that user expect), mời bạn tham khảo\n"
+            "Vâng, bên mình có cuốn sách (or truyện depending on Query) ...(Name of books that user expect), bạn có thể tham khảo qua! or Đây là danh sách sách các sách (or truyện depending on Query) liên quan đến ..(Name of books that user expect), mời bạn tham khảo\n"
             "2. if users are finding some specific books and given retrieved rows not includes the books, your response should be:\n"
-            "Xin lỗi, hiện tại bên chúng tôi đang không có sách mà bạn đang cần, bạn có thể thử tìm sách khác hoặc chúng tôi có thể đề xuất cho bạn một số sách\n"
+            "Xin lỗi, hiện tại bên mình đang không có sách (or truyện depending on Query) ...(Name of books that user expect) mà bạn đang cần, bạn có thể thử tìm sách khác hoặc mình có thể đề xuất cho bạn một số sách\n"
             "3. if users dont find the specific books and want to be suggested some books, your response should be:\n"
-            "Đây là một số sách tôi có thể đề xuất cho bạn\n"
+            "Đây là một số sách (or truyện depending on Query) mình có thể đề xuất cho bạn\n"
+            "Then you can ask the user some other questions that the user might be interested in related to the question.\n"
+            "Example:\n"
+            "Query: Tôi muốn tìm truyện Doraemon\n"
+            "Response: Đây là danh sách truyện Doraemon hiện tại chúng mình đang có, bạn có thể cho mình biết bạn đang muốn tìm tập truyện nào để mình tìm kiếm cho bạn\n"
+            "\n"
+            "Query: Tôi muốn tìm truyện Naruto"
+            "Response: Bên mình truyện Naruto hiện tại đang có rất nhiều, bạn có thể tham khảo qua, đồng thời truyện Naruto bên mình cũng đang ưu đãi giảm giá khá nhiều nhé!"
+            "\n"
+            "Query: Bạn có thể đề giới thiệu cho tôi một số truyện bạn đang có\n"
+            "Response: Đây là một số truyện mình có thể đề xuất cho bạn, nếu bạn quan tâm đến sản phẩm nào có thể cho mình biết nhé!\n"
+            "\n"
             "Response: "
         )
         self.response_synthesis_prompt = PromptTemplate(
@@ -173,11 +187,44 @@ class SQLQueryPipeline:
         response = self.adjust_sql_query(response)
         return response
     
+    
+    def extract_columns(self, sql_query):
+        # Parse the SQL query
+        parsed = sqlparse.parse(sql_query)
+        statement = parsed[0]  # Chỉ lấy câu truy vấn đầu tiên nếu có nhiều câu
+
+        # Tìm các phần SELECT trong câu truy vấn
+        select_seen = False
+        columns = []
+        
+        for token in statement.tokens:
+            # Kiểm tra nếu từ khóa là SELECT
+            if select_seen:
+                # Nếu gặp dấu phẩy hoặc danh sách các cột
+                if isinstance(token, IdentifierList):
+                    for identifier in token.get_identifiers():
+                        columns.append(str(identifier))
+                elif isinstance(token, Identifier):
+                    columns.append(str(token))
+                elif token.ttype is Keyword:
+                    # Dừng khi gặp từ khóa khác (ví dụ: FROM)
+                    break
+            elif token.ttype is DML and token.value.upper() == 'SELECT':
+                select_seen = True
+        
+        return columns
+    
 
     def nodes_to_rows(self, retriever: List[NodeWithScore]):
+        try:
+            sql_query = retriever[0].node.metadata['sql_query']
+        except KeyError:
+            return "[]"
+        columns = self.extract_columns(sql_query)
         rows = [node.node.metadata['result'] for node in retriever]
         rows = list(itertools.chain(*rows))
-        return str(rows[:24])
+        rows = [{column: value for column, value in zip(columns, row)} for row in rows[:24]]
+        return str(rows)
     
 
     def return_response_and_node(self, rows, sql_query: str, response: ChatResponse):
