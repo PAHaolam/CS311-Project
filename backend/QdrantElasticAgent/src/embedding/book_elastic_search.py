@@ -1,7 +1,9 @@
+import json
 from icecream import ic
 from elasticsearch.helpers import bulk
 from elasticsearch import Elasticsearch
 from llama_index.core.bridge.pydantic import Field
+from llama_index.llms.openai import OpenAI
 
 from src.schemas import BookElasticSearchResponse, Book3
 
@@ -24,6 +26,7 @@ class ElasticSearch:
         ic(url, index_name)
 
         self.es_client = Elasticsearch(url)
+        self.llm = OpenAI(model="gpt-4o-mini")
         self.index_name = index_name
         self.create_index()
 
@@ -101,7 +104,8 @@ class ElasticSearch:
 
         return success
 
-    def search(self, query: str, k: int = 20) -> list[BookElasticSearchResponse]:
+
+    def search(self, search_body, k: int = 24) -> list[BookElasticSearchResponse]:
         """
         Search the books relevant to the query.
 
@@ -112,31 +116,22 @@ class ElasticSearch:
         Returns:
             list[ElasticSearchResponse]: List of ElasticSearch response objects.
         """
-        ic(query, k)
 
         self.es_client.indices.refresh(
             index=self.index_name
         )  # Force refresh before each search
-        search_body = {
-            "query": {
-                "multi_match": {
-                    "query": query,
-                    "fields": ["title", "gift", "description", "img_url", "authors", "readers", "book_set"],
-                }
-            },
-            "size": k,
-        }
+        
         response = self.es_client.search(index=self.index_name, body=search_body)
 
         return [
             BookElasticSearchResponse(
-                id=hit["_source"]["book_id"],
+                # id=hit["_source"]["book_id"],
                 URL=hit["_source"]["URL"],
                 title=hit["_source"]["title"],
                 current_price=hit["_source"]["current_price"],
                 original_price=hit["_source"]["original_price"],
                 img_url=hit["_source"]["img_url"],
-                score=hit["_score"],
+                # score=hit["_score"],
             )
             for hit in response["hits"]["hits"]
         ]

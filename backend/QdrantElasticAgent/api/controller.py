@@ -43,6 +43,18 @@ async def complete_text(request: Request):
                 "img_url": row["img_url"]
             }
             books.append(book)
+
+        # chat_store_key = assistant.query_engine.memory.chat_store_key
+        # chat_store = assistant.query_engine.memory.chat_store.store
+        # try:
+        #     chat_store[chat_store_key].pop(-3)
+        #     chat_store[chat_store_key].pop(-2)
+        #     chat_store[chat_store_key].pop(-1)
+        #     chat_store.setdefault(chat_store_key, []).append(ChatMessage(content=response, role=MessageRole.ASSISTANT))
+        #     print("Modify chat store successfully!")
+        # except Exception as e:
+        #     print(f"Modify chat store unsuccessfully! Error: {e}")
+
     except SyntaxError:
         pass
     

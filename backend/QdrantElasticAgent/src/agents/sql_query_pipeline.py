@@ -21,16 +21,23 @@ from sqlparse.tokens import Keyword, DML
 
 import itertools
 import json
+import ast
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from src.schemas import Book3
+from src.schemas import Book3, BookElasticSearchResponse
+from src.embedding.book_elastic_search import ElasticSearch
+from src.settings import setting
 
 class SQLQueryPipeline:
     def __init__(self):
         SQLALCHEMY_DATABASE_URL = config("DATABASE_URL")
         self.engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+
+        self.es = ElasticSearch(
+            url=setting.elastic_search_url, index_name=setting.book_elastic_search_index_name
+        )
 
         self.table_infos = [
             {
@@ -70,7 +77,24 @@ class SQLQueryPipeline:
             dialect=self.engine.dialect.name
         )
 
+        self.es_mappings = json.dumps(
+            self.es.es_client.indices.get_mapping(index=self.es.index_name)[self.es.index_name]['mappings'],
+            indent=4
+        )
+
+        self.sql2dsl_prompt_str = '''
+            Given the mapping: {mappings}
+            translate the sql_query: {sql_query}
+            in a valid Elasticsearch DSL query
+            Note that you only returns the synthesized Elasticsearch DSL query, not any other information such as explaination.
+        '''
+        self.sql2dsl_prompt_component = FnComponent(fn=self.sql2dsl_prompt)
+
+        self.dsl_parser_component = FnComponent(fn=self.parse_response_to_dsl)
+
         self.nodes2rows_component = FnComponent(fn=self.nodes_to_rows)
+
+        self.es_retriever_component = FnComponent(fn=self.es_search)
 
         self.response_synthesis_prompt_str = (
             "Given an input question, synthesize a response from the query results.\n"
@@ -80,7 +104,7 @@ class SQLQueryPipeline:
             "You will define whether if users are finding some specific books or users dont find the specific books and want to be suggested some books\n"
             "1. if users are finding some specific books and given retrieved rows includes the books, your response should be:\n"
             "Vâng, bên mình có cuốn sách (or truyện depending on Query) ...(Name of books that user expect), bạn có thể tham khảo qua! or Đây là danh sách sách các sách (or truyện depending on Query) liên quan đến ..(Name of books that user expect), mời bạn tham khảo\n"
-            "2. if users are finding some specific books and given retrieved rows not includes the books, your response should be:\n"
+            "2. if users are finding some specific books and given retrieved rows is empty, your response should be:\n"
             "Xin lỗi, hiện tại bên mình đang không có sách (or truyện depending on Query) ...(Name of books that user expect) mà bạn đang cần, bạn có thể thử tìm sách khác hoặc mình có thể đề xuất cho bạn một số sách\n"
             "3. if users dont find the specific books and want to be suggested some books, your response should be:\n"
             "Đây là một số sách (or truyện depending on Query) mình có thể đề xuất cho bạn\n"
@@ -112,8 +136,12 @@ class SQLQueryPipeline:
                 "text2sql_prompt": self.text2sql_prompt,
                 "text2sql_llm": self.llm,
                 "sql_output_parser": self.sql_parser_component,
+                "sql2dsl_prompt": self.sql2dsl_prompt_component,
+                "sql2dsl_llm": self.llm,
+                "dsl_output_parser": self.dsl_parser_component,
                 "sql_retriever": self.sql_retriever,
                 "nodes_to_rows": self.nodes2rows_component,
+                "es_retriever": self.es_retriever_component,
                 "response_synthesis_prompt": self.response_synthesis_prompt,
                 "response_synthesis_llm": self.llm,
                 "return_response_and_node": self.response_and_node_component,
@@ -185,8 +213,20 @@ class SQLQueryPipeline:
             response = response[:sql_result_start]
         response = response.strip().strip("```").strip()
         response = self.adjust_sql_query(response)
-        return response
+        return response 
+
+
+    def sql2dsl_prompt(self, sql_query: str) -> str:
+        prompt = self.sql2dsl_prompt_str.format(mappings = self.es_mappings,
+                                                sql_query = sql_query)
+        return prompt
     
+
+    def parse_response_to_dsl(self, response: ChatResponse) -> str:
+        """Parse response to SQL."""
+        response = response.message.content
+        return response
+
     
     def extract_columns(self, sql_query):
         # Parse the SQL query
@@ -215,16 +255,30 @@ class SQLQueryPipeline:
         return columns
     
 
-    def nodes_to_rows(self, retriever: List[NodeWithScore]):
-        try:
-            sql_query = retriever[0].node.metadata['sql_query']
-        except KeyError:
-            return "[]"
-        columns = self.extract_columns(sql_query)
-        rows = [node.node.metadata['result'] for node in retriever]
+    def nodes_to_rows(self, sql_retriever: List[NodeWithScore], es_retriever: list[BookElasticSearchResponse]):
+        rows = [node.node.metadata['result'] for node in sql_retriever]
         rows = list(itertools.chain(*rows))
-        rows = [{column: value for column, value in zip(columns, row)} for row in rows[:24]]
-        return str(rows)
+        rows = [{"title": row[0],
+                 "URL": row[1],
+                 "current_price": row[2],
+                 "original_price": row[3],
+                 "img_url": row[4],} for row in rows[:24]]
+        if len(rows)>0:
+            return str(rows)
+        
+        rows2 = [{"URL": node.URL,
+                  "title": node.title,
+                  "current_price": node.current_price,
+                  "original_price": node.original_price,
+                  "img_url": node.img_url} 
+                  for node in es_retriever[:24]]
+        return str(rows2)
+    
+
+    def es_search(self, dsl_query):
+       search_body = ast.literal_eval(dsl_query)
+       es_retriever = self.es.search(search_body)
+       return es_retriever
     
 
     def return_response_and_node(self, rows, sql_query: str, response: ChatResponse):
@@ -239,8 +293,14 @@ class SQLQueryPipeline:
         self.qp.add_chain(
             ["text2sql_prompt", "text2sql_llm", "sql_output_parser", "sql_retriever"]
         )
+        self.qp.add_chain(
+            ["sql_output_parser", "sql2dsl_prompt", "sql2dsl_llm", "dsl_output_parser", "es_retriever"]
+        )
         self.qp.add_link(
-            "sql_retriever", "nodes_to_rows", dest_key="retriever"
+            "sql_retriever", "nodes_to_rows", dest_key="sql_retriever"
+        )
+        self.qp.add_link(
+            "es_retriever", "nodes_to_rows", dest_key="es_retriever"
         )
         self.qp.add_link(
             "sql_output_parser", "response_synthesis_prompt", dest_key="sql_query"

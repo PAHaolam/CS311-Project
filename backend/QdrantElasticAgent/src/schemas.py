@@ -55,13 +55,13 @@ class BookElasticSearchResponse(BaseModel):
     ElasticSearch response schema.
     """
 
-    id: str
+    # id: str
     URL: str
     title: str
     current_price: int
     original_price: int
     img_url: str
-    score: float
+    # score: float
 
 
 class Book3(SQLModel, table=True):
