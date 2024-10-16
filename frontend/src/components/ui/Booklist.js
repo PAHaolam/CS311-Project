@@ -22,7 +22,7 @@ const Booklist = ({ selectedBooks }) => {
                                     className="badge bg-dark text-white position-absolute"
                                     style={{ top: "0.5rem", right: "0.5rem" }}
                                 >
-                                    Kết quả
+                                    {book["type"]}
                                 </div>
                                 <div className="card-body p-4">
                                     <div className="text-center">

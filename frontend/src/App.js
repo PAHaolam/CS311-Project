@@ -12,7 +12,7 @@
 
 // export default App;
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Narbar from './components/ui/Navbar';
 import Header from './components/ui/Header';
 import Chatbox from './components/ui/Chatbox';
@@ -43,6 +43,29 @@ function App() {
     setInputValue(event.target.value);  // Cập nhật state khi người dùng nhập
   };
 
+  const updateBooks = (books, k) => {
+    // Hàm đệ quy để cập nhật danh sách sách mỗi 200ms
+    if (k <= books.length) {
+      setSelectedBooks(books.slice(0, k)); // Lấy k phần tử đầu tiên
+      setTimeout(() => {
+        updateBooks(books, k + 1); // Tăng k và gọi lại sau 200ms
+      }, 300); // 200ms
+    }
+  };
+
+  const initBooks = async () => {
+    try{
+      const init_books = await api.post('/v1/init_books');
+      setSelectedBooks(init_books.data.books)
+    } catch (error) {
+      console.error("Error fetching API response:", error);
+    }
+  }
+  // useEffect ensures the function is called once when the component mounts
+  useEffect(() => {
+    initBooks();
+  }, []); // Empty dependency array ensures it runs only once
+
   const handleSendMessage = async () => {
     if(inputValue===''){
       return;
@@ -57,7 +80,7 @@ function App() {
         setResponseWaiting(false)
         setContentChatbox(prevContent => prevContent.concat({ "typeChat": "received", "contentChat": response.data.response }));
         if(response.data.books.length>0){
-          setSelectedBooks(response.data.books)
+          updateBooks(response.data.books, 1);
         }
         // console.log(response.data.books)
       } catch (error) {
