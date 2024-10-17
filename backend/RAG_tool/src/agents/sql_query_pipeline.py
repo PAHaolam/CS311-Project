@@ -87,6 +87,7 @@ class SQLQueryPipeline:
             Given the mapping: {mappings}
             translate the sql_query: {sql_query}
             in a valid Elasticsearch DSL query
+            please include "operator": "and"
             Note that you only returns the synthesized Elasticsearch DSL query, not any other information such as explaination.
         '''
         self.sql2dsl_prompt_component = FnComponent(fn=self.sql2dsl_prompt)
@@ -293,8 +294,8 @@ class SQLQueryPipeline:
         return es_retriever
     
 
-    def return_response_and_node(self, rows, sql_query: str, response: ChatResponse):
-        response_dict = {"rows": eval(rows), "sql_query": sql_query, "response": response.message.content}
+    def return_response_and_node(self, rows, sql_query: str, dsl_query: str, response: ChatResponse):
+        response_dict = {"rows": eval(rows), "sql_query": sql_query, "dsl_query": dsl_query, "response": response.message.content}
         response_json = json.dumps(response_dict, ensure_ascii=False)
         return response_json
     
@@ -327,6 +328,9 @@ class SQLQueryPipeline:
         )
         self.qp.add_link(
             "sql_output_parser", "return_response_and_node", dest_key="sql_query"
+        )
+        self.qp.add_link(
+            "dsl_output_parser", "return_response_and_node", dest_key="dsl_query"
         )
         self.qp.add_link(
             "nodes_to_rows", "return_response_and_node", dest_key="rows"
