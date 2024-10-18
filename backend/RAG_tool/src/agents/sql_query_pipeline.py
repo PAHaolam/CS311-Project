@@ -292,16 +292,21 @@ class SQLQueryPipeline:
     
 
     def es_search(self, dsl_query):
-        search_body = ast.literal_eval(dsl_query)
-        valid_search_body = {}
-        if "query" in search_body:
-            valid_search_body["query"] = search_body["query"]
-        if "sort" in search_body:
-            valid_search_body["sort"] = search_body["sort"]
-        if "_source" in search_body:
-            valid_search_body["_source"] = search_body["_source"]
-        es_retriever = self.es.search(valid_search_body)
-        return es_retriever
+        try:
+            search_body = ast.literal_eval(dsl_query)
+            valid_search_body = {}
+            if "query" in search_body:
+                valid_search_body["query"] = search_body["query"]
+            if "sort" in search_body:
+                valid_search_body["sort"] = search_body["sort"]
+            if "_source" in search_body:
+                valid_search_body["_source"] = search_body["_source"]
+            es_retriever = self.es.search(valid_search_body)
+            return es_retriever
+        except (ValueError, SyntaxError) as e:
+            return []
+        except Exception as e:
+            return []
     
 
     def return_response_and_node(self, rows, sql_query: str, dsl_query: str, response: ChatResponse):
