@@ -48,6 +48,12 @@ def load_order_create_tool(callbacks, memory):
     return Tool(
         name="Create a books order",
         func=answer_query,
-        description="Create a books order.",
+        description="""Create a books order.
+        Trả lời những câu hỏi liên quan đến tìm kiếm thông tin về một sản phẩm cụ thể của công công ty.
+        Giúp thực hiện lên đơn khi đã biết thông tin về sản phẩm mà khách hàng muốn đặt mua
+            Những tình huống khi sử dụng công cụ này như:
+            - Khách hàng yêu cầu đặt hàng cho sản phẩm cụ thể
+            - Khách hàng cung cấp thông tin cần thiết của khách hàng như tên, số điện thoại và địa chỉ
+        """,
         callbacks=callbacks
     )

@@ -25,6 +25,7 @@ def load_product_search_tool():
         Returns:
             str: The answer to the query.
         """
+        query_str = query_str.lower().replace("truyện", "").strip()
         product_list = df_product['title'].tolist()
         list_product_name_by_fuzzy = process.extract(query_str, product_list, limit=5)
 

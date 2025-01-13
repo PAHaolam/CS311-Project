@@ -4,7 +4,7 @@ load_dotenv(override=True)
 
 from langchain_openai import ChatOpenAI
 from langchain.agents import create_react_agent, AgentExecutor
-from langchain import hub
+# from langchain import hub
 from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
@@ -12,6 +12,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from src.tools.product_search_tool import load_product_search_tool
 from src.tools.order_create_tool import load_order_create_tool, OrderCreateHandler
 from src.agents.memory import SlotMemory
+from src.prompts import REACT_PROMPT
 
 
 class ChatbotAssistant:
@@ -51,15 +52,16 @@ class ChatbotAssistant:
             model="gpt-4o-mini",
             temperature=0
         )
-        react_prompt = hub.pull("hwchase17/react")
+        # react_prompt = hub.pull("hwchase17/react")
         agent = create_react_agent(
-            llm=llm, tools=self.tools, prompt=react_prompt)
+            llm=llm, tools=self.tools, prompt=REACT_PROMPT)
         agent_executor = AgentExecutor(
             agent=agent, 
             tools=self.tools, 
             memory=self.memory,
             callbacks=[self.order_create_handler],
-            verbose=True
+            verbose=True,
+            handle_parsing_errors=True
         )
 
         return agent_executor
@@ -103,16 +105,8 @@ class ChatbotAssistant:
 if __name__=="__main__":
     assistant = ChatbotAssistant()
 
-    message = "Xin chào tôi là Hảo, tôi muốn tìm truyện Naruto"
+    message = "Xin chào"
     response = assistant.complete(message)
 
     print(response)
-
-    message = "Tôi muốn đặt cuốn thứ 3"
-    response = assistant.complete(message)
-
-    print(response)
-
-    slot = assistant.check_slot()
-    print(slot)
     
