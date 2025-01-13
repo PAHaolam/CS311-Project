@@ -1,0 +1,1 @@
+2025/01/13 10:24:19 : {'name': 'Hảo', 'book_list': [['Naruto', 1]], 'phone': '0935374902', 'address': '144 Nguyễn Văn Linh, Đà Nẵng'}
