@@ -2,3 +2,4 @@
 2025/01/13 19:19:06 : {'name': 'Hảo', 'book_list': [['Naruto', 1]], 'phone': '0935374902', 'address': 'Đà Nẵng'}
 2025/01/13 20:23:27 : {'name': 'Hảo', 'book_list': [['Naruto', 1]], 'phone': '0935374902', 'address': 'Đà Nẵng'}
 2025/01/13 20:25:56 : {'name': 'Hảo', 'book_list': [['Naruto', 1], ['Doraemon bóng chày - Truyền kì về bóng chày siêu cấp - Tập 5', 1]], 'phone': '0935374902', 'address': 'Đà Nẵng'}
+2025/01/13 22:40:39 : {'name': 'Hảo', 'book_list': [['Naruto', 1]], 'phone': '0935374902', 'address': 'Đà Nẵng'}

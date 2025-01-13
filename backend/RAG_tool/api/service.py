@@ -3,22 +3,23 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 from langchain_openai import ChatOpenAI
-from langchain.agents import create_react_agent, AgentExecutor
-# from langchain import hub
+from langchain.agents import create_tool_calling_agent, AgentExecutor
 from pathlib import Path
+import re
 import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
-from src.tools.product_search_tool import load_product_search_tool
-from src.tools.order_create_tool import load_order_create_tool, OrderCreateHandler
+from src.tools.product_search_tool import product_search_tool
+from src.tools.order_create_tool import raw_order_create_tool
+from langchain_core.tools.render import render_text_description
 from src.agents.memory import SlotMemory
 from src.prompts import REACT_PROMPT
+from langchain_core.tools import tool
 
 
 class ChatbotAssistant:
     def __init__(self):
         self.memory = self.create_chat_memory()
-        self.order_create_handler = OrderCreateHandler()
         self.tools = self.load_tools()
         self.agent_executor = self.create_agent_executor()
 
@@ -34,8 +35,17 @@ class ChatbotAssistant:
         """
         Load default RAG tool.
         """
-        product_search_tool = load_product_search_tool()
-        order_create_tool = load_order_create_tool([self.order_create_handler], self.memory)
+        @tool
+        def order_create_tool(query_str: str):
+            """
+            Trả lời những câu hỏi liên quan đến tìm kiếm thông tin về một sản phẩm cụ thể của công công ty.
+            Giúp thực hiện lên đơn khi đã biết thông tin về sản phẩm mà khách hàng muốn đặt mua
+                Những tình huống khi sử dụng công cụ này như:
+                - Khách hàng yêu cầu đặt hàng cho sản phẩm cụ thể
+                - Khách hàng cung cấp thông tin cần thiết của khách hàng như tên, số điện thoại và địa chỉ
+            """
+            return raw_order_create_tool(query_str, self.memory)
+        
         return [product_search_tool, order_create_tool]
 
     def create_agent_executor(self):
@@ -52,14 +62,16 @@ class ChatbotAssistant:
             model="gpt-4o-mini",
             temperature=0
         )
-        # react_prompt = hub.pull("hwchase17/react")
-        agent = create_react_agent(
-            llm=llm, tools=self.tools, prompt=REACT_PROMPT)
+        react_prompt = REACT_PROMPT.partial(
+            tools=render_text_description(list(self.tools)),
+            tool_names=", ".join([t.name for t in self.tools]),
+        )
+        agent = create_tool_calling_agent(
+            llm=llm, tools=self.tools, prompt=react_prompt)
         agent_executor = AgentExecutor(
             agent=agent, 
             tools=self.tools, 
             memory=self.memory,
-            callbacks=[self.order_create_handler],
             verbose=True,
             handle_parsing_errors=True
         )
@@ -76,30 +88,15 @@ class ChatbotAssistant:
         Returns:
             str: The response.
         """
-        try:
-            result = self.agent_executor.invoke(
-                input={"input": query}
-            )
-            return result["output"]
-        except KeyboardInterrupt as e:
-            inputs = {'input': query}
-            outputs = {'output': e.args[0]}
-            self.memory.save_context(inputs, outputs)
-            return e.args[0]
-            
-    def check_memory(self):
-        """
-        Check the current content of the memory.
+        result = self.agent_executor.invoke(
+            input={"input": query}
+        )
+        result = result["output"]
 
-        Returns:
-            dict: The current slots and chat history from memory.
-        """
-        memory_variables = self.memory.chat_memory.messages
-        return memory_variables
-    
-    def check_slot(self):
-        slot = self.memory.current_slots
-        return slot
+        match = re.search(r"Final Answer:\s*(.+)", result, re.DOTALL)
+        result = match.group(1) if match else result
+        
+        return result
 
     
 if __name__=="__main__":

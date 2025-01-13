@@ -89,6 +89,6 @@ Question: {input}
 Thought:{agent_scratchpad}
 """
 REACT_PROMPT = PromptTemplate(
-    input_variables=['agent_scratchpad', 'input', 'tool_names', 'tools'],
+    input_variables=['agent_scratchpad', 'input'],
     template=_REACT_TEMPLATE
 )
