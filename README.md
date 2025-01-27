@@ -1,7 +1,14 @@
 tạo file backend/.env lưu 2 biến OPENAI_API_KEY và LANGCHAIN_API_KEY
 
-đầu tiên cứ vọc thử chatbot trong file backend/RAG_tool/service.py
+tải thư viện cần thiết: 
+<pre> <code>pip install -r requirements.txt</code></pre>
 
-ko lưu lại thư viện nên chạy file nó yêu cầu gì thì pip install nấy
+chạy backend:
+<pre> <code>cd backend</code></pre>
+<pre> <code>uvicorn main:app --reload</code></pre>
+
+chạy frontend:
+<pre> <code>cd frontend</code></pre>
+<pre> <code>streamlit run Home.py</code></pre>
 
 
