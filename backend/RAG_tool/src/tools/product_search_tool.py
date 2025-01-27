@@ -1,9 +1,10 @@
 import pandas as pd
 from thefuzz import process
 from langchain_core.tools import tool
+from pathlib import Path
 
-
-file_path = r'D:\HK5\AIEngineer\CS311_Project\backend\RAG_tool\data\sample_data5.csv' 
+current_dir = Path(__file__).resolve().parent.parent
+file_path = current_dir.parent / "data" / "sample_data5.csv"
 df_product = pd.read_csv(file_path)
 
 

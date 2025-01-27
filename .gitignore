@@ -1,4 +1,4 @@
 tests/
-Pipfile
-Pipfile.lock
+__pycache__/
+venv/
 .env

@@ -22,8 +22,7 @@ def main():
         if not st.session_state["chat_answers_history"]:
             with st.chat_message(name="assistant", avatar=professor_avatar):
                 initial_message = (
-                    "Chào bạn, mình là AIO MENTHAL HEALTH được phát triển bởi AI VIET NAM. "
-                    "Mình sẽ giúp bạn chăm sóc sức khỏe tinh thần. Hãy nói chuyện với mình để bắt đầu."
+                    "Chào bạn mình là chatbot hỗ trợ tư vấn, bạn cần giúp gì?"
                 )
                 st.markdown(initial_message)
                 st.session_state["chat_answers_history"].append(initial_message)

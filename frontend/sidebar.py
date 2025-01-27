@@ -1,7 +1,7 @@
 import streamlit as st
 
 def show_sidebar():
-    st.sidebar.image("images/logo.jpg", use_column_width=True)
+    st.sidebar.image("images/logo.jpg", use_container_width=True)
     st.sidebar.markdown('### Hệ thống Bán hàng sách tích hợp Chatbot tư vấn khách hàng.')
 
     st.sidebar.markdown('Hướng dẫn sử dụng:')

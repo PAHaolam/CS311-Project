@@ -12,7 +12,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 from src.tools.product_search_tool import product_search_tool
 from src.tools.order_create_tool import raw_order_create_tool
 from langchain_core.tools.render import render_text_description
-from src.agents.memory import SlotMemory
+from src.memory import SlotMemory
 from src.prompts import REACT_PROMPT
 from langchain_core.tools import tool
 
@@ -38,7 +38,7 @@ class ChatbotAssistant:
         @tool
         def order_create_tool(query_str: str):
             """
-            Trả lời những câu hỏi liên quan đến tìm kiếm thông tin về một sản phẩm cụ thể của công công ty.
+            Trả lời những câu hỏi liên quan đến tìm kiếm thông tin về một sản phẩm cụ thể của cửa hàng.
             Giúp thực hiện lên đơn khi đã biết thông tin về sản phẩm mà khách hàng muốn đặt mua
                 Những tình huống khi sử dụng công cụ này như:
                 - Khách hàng yêu cầu đặt hàng cho sản phẩm cụ thể

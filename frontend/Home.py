@@ -32,7 +32,7 @@ def main():
             cols = st.columns(4)  # Tạo 4 cột
             for col, book in zip(cols, newest_books[i:i + 4]):
                 with col:
-                    st.image(book['img_url'], use_column_width=True)
+                    st.image(book['img_url'], use_container_width=True)
                     st.markdown(f"### {book['title']}")
                     st.write(f"**Giá:** {book['current_price']}")
                     st.write(f"**~~{book['original_price']}~~")
@@ -43,7 +43,7 @@ def main():
             cols = st.columns(4)  # Tạo 4 cột
             for col, book in zip(cols, trending_books[i:i + 4]):
                 with col:
-                    st.image(book['img_url'], use_column_width=True)
+                    st.image(book['img_url'], use_container_width=True)
                     st.markdown(f"### {book['title']}")
                     st.write(f"**Giá hiện tại:** {book['current_price']}")
                     st.write(f"**Giá gốc:** {book['original_price']}")

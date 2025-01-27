@@ -1,0 +1,10 @@
+langchain
+python-dotenv
+langchain-openai
+icecream
+thefuzz
+pandas
+fastapi
+uvicorn
+langchain-community
+streamlit

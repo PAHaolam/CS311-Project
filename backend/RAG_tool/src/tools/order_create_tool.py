@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 
 
 def raw_order_create_tool(query_str: str, memory) -> str:
@@ -20,7 +21,9 @@ def raw_order_create_tool(query_str: str, memory) -> str:
         return output
     else:
         current_time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-        with open(r"D:\HK5\AIEngineer\CS311_Project\backend\RAG_tool\data\orders.txt", "a", encoding="utf-8") as file:
+        current_dir = Path(__file__).resolve().parent.parent
+        file_path = current_dir.parent / "data" / "orders.txt"
+        with open(file_path, "a", encoding="utf-8") as file:
             # Ghi dòng mới với thời gian và giá trị của slots.current_slots
             file.write(f"{current_time} : {slot}\n")
         return "Mình đã nhận được đầy đủ thông tin của bạn, đơn hàng của bạn đã được đặt thành công!"
